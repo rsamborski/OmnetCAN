@@ -1,0 +1,3 @@
+package omnetcan;
+
+@license(LGPL);
