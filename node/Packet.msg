@@ -1,20 +1,14 @@
 //
-// This file is part of an OMNeT++/OMNEST simulation example.
-//
-// Copyright (C) 1992-2008 Andras Varga
-//
-// This file is distributed WITHOUT ANY WARRANTY. See the file
-// `license' for details on this and other legal matters.
+// Represents a packet in the CCN network. One packet is used to represent Interest and Data packets
 //
 
+cplusplus {{
+#include "ccn.h"
+}}
 
-//
-// Represents a packet in the network.
-//
 packet Packet
 {
-    int srcAddr;
-    int destAddr;
-    int hopCount;
+    int contentId;
+    int packetType;
+    string data;
 }
-

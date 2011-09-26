@@ -24,7 +24,9 @@ class App : public cSimpleModule
   private:
     // configuration
     int myAddress;
-    std::vector<int> destAddresses;
+    int searchContentId;
+
+    //    std::vector<int> destAddresses;
     cPar *sendIATime;
     cPar *packetLengthBytes;
 
@@ -36,6 +38,9 @@ class App : public cSimpleModule
     simsignal_t endToEndDelaySignal;
     simsignal_t hopCountSignal;
     simsignal_t sourceAddressSignal;
+    simsignal_t dropSignal;
+    simsignal_t contentReceivedSignal;
+
 
   public:
     App();
@@ -62,6 +67,7 @@ App::~App()
 void App::initialize()
 {
     myAddress = par("address");
+    searchContentId = par("searchContentId");
     packetLengthBytes = &par("packetLength");
     sendIATime = &par("sendIaTime");  // volatile parameter
     pkCounter = 0;
@@ -69,7 +75,7 @@ void App::initialize()
     WATCH(pkCounter);
     WATCH(myAddress);
 
-    const char *destAddressesPar = par("destAddresses");
+/*    const char *destAddressesPar = par("destAddresses");
     cStringTokenizer tokenizer(destAddressesPar);
     const char *token;
     while ((token = tokenizer.nextToken())!=NULL)
@@ -77,6 +83,7 @@ void App::initialize()
 
     if (destAddresses.size() == 0)
         throw cRuntimeError("At least one address must be specified in the destAddresses parameter!");
+*/
 
     generatePacket = new cMessage("nextPacket");
     scheduleAt(sendIATime->doubleValue(), generatePacket);
@@ -84,6 +91,7 @@ void App::initialize()
     endToEndDelaySignal = registerSignal("endToEndDelay");
     hopCountSignal =  registerSignal("hopCount");
     sourceAddressSignal = registerSignal("sourceAddress");
+    contentReceivedSignal = registerSignal("contentReceived");
 }
 
 void App::handleMessage(cMessage *msg)
@@ -91,16 +99,18 @@ void App::handleMessage(cMessage *msg)
     if (msg == generatePacket)
     {
         // Sending packet
-        int destAddress = destAddresses[intuniform(0, destAddresses.size()-1)];
+        //int destAddress = destAddresses[intuniform(0, destAddresses.size()-1)];
 
         char pkname[40];
-        sprintf(pkname,"pk-%d-to-%d-#%ld", myAddress, destAddress, pkCounter++);
-        EV << "generating packet " << pkname << endl;
+        sprintf(pkname,"interest-from-%d-cid-%d-#%ld", myAddress, searchContentId, pkCounter++);
+        EV << "generating Interest packet: " << pkname << endl;
 
         Packet *pk = new Packet(pkname);
         pk->setByteLength(packetLengthBytes->longValue());
-        pk->setSrcAddr(myAddress);
-        pk->setDestAddr(destAddress);
+        pk->setContentId(searchContentId);
+        pk->setPacketType(PACKET_INTEREST);
+//        pk->setSrcAddr(myAddress);
+//        pk->setDestAddr(destAddress);
         send(pk,"out");
 
         scheduleAt(simTime() + sendIATime->doubleValue(), generatePacket);
@@ -110,16 +120,42 @@ void App::handleMessage(cMessage *msg)
     {
         // Handle incoming packet
         Packet *pk = check_and_cast<Packet *>(msg);
-        EV << "received packet " << pk->getName() << " after " << pk->getHopCount() << "hops" << endl;
-        emit(endToEndDelaySignal, simTime() - pk->getCreationTime());
-        emit(hopCountSignal, pk->getHopCount());
-        emit(sourceAddressSignal, pk->getSrcAddr());
-        delete pk;
+        EV << "received packet " << pk->getName() << endl;
 
-        if (ev.isGUI())
-        {
-            getParentModule()->getDisplayString().setTagArg("i",1,"green");
-            getParentModule()->bubble("Arrived!");
+        /* We check the type of received packet */
+        if(pk->getPacketType() == PACKET_INTEREST) {
+			EV << "ERROR: app received an Interest packet " << pk->getName() << endl;
+			emit(dropSignal, (long)pk->getByteLength());
+			delete pk;
+
+			if (ev.isGUI())
+        	{
+        		getParentModule()->getDisplayString().setTagArg("i",1,"red");
+        		getParentModule()->bubble("ERROR: interest delivered to app!");
+        	}
+        } else if(pk->getPacketType() == PACKET_DATA) {
+        	if(pk->getContentId() == searchContentId) {
+        		emit(endToEndDelaySignal, simTime() - pk->getCreationTime());
+   	        	emit(contentReceivedSignal, searchContentId);
+
+   	        	if (ev.isGUI())
+   	        	{
+   	        		getParentModule()->getDisplayString().setTagArg("i",1,"green");
+   	        		getParentModule()->bubble("Content arrived!");
+   	        	}
+        	} else {
+   	        	emit(contentReceivedSignal, -1); // wrong content
+
+   	        	if (ev.isGUI())
+   	        	{
+   	        		getParentModule()->getDisplayString().setTagArg("i",1,"red");
+   	        		getParentModule()->bubble("ERROR: wrong content arrived!");
+   	        	}
+        	}
+
+        	delete pk;
+
+
         }
     }
 }

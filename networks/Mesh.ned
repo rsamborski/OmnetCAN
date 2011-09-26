@@ -29,12 +29,12 @@ network Mesh
                 address = index;
                 @display("p=,,m,$width,40,40");
             gates:
-                port[4];
+                face[4];
         }
     connections allowunconnected:
         for i=0..height-1, for j=0..width-1 {
-            node[i*width+j].port[0] <--> C <--> node[(i+1)*width+j].port[1] if i!=height-1;
-            node[i*width+j].port[2] <--> C <--> node[(i*width+j)+1].port[3] if j!=width-1;
+            node[i*width+j].face[0] <--> C <--> node[(i+1)*width+j].face[1] if i!=height-1;
+            node[i*width+j].face[2] <--> C <--> node[(i*width+j)+1].face[3] if j!=width-1;
         }
 }
 

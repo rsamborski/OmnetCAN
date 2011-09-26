@@ -60,18 +60,18 @@ network Simple_tree
         node_2_8: Node { parameters: address = 28; }
 
     connections allowunconnected:
-        node_1_0.port++ <--> C <--> node_0_0.port++;
-        node_1_1.port++ <--> C <--> node_0_0.port++;
-        node_1_2.port++ <--> C <--> node_0_0.port++;
+        node_1_0.face++ <--> C <--> node_0_0.face++;
+        node_1_1.face++ <--> C <--> node_0_0.face++;
+        node_1_2.face++ <--> C <--> node_0_0.face++;
 
-        node_2_0.port++ <--> C <--> node_1_0.port++;
-        node_2_1.port++ <--> C <--> node_1_0.port++;
-        node_2_2.port++ <--> C <--> node_1_0.port++;
-        node_2_3.port++ <--> C <--> node_1_1.port++;
-        node_2_4.port++ <--> C <--> node_1_1.port++;
-        node_2_5.port++ <--> C <--> node_1_1.port++;
-        node_2_6.port++ <--> C <--> node_1_2.port++;
-        node_2_7.port++ <--> C <--> node_1_2.port++;
-        node_2_8.port++ <--> C <--> node_1_2.port++;
+        node_2_0.face++ <--> C <--> node_1_0.face++;
+        node_2_1.face++ <--> C <--> node_1_0.face++;
+        node_2_2.face++ <--> C <--> node_1_0.face++;
+        node_2_3.face++ <--> C <--> node_1_1.face++;
+        node_2_4.face++ <--> C <--> node_1_1.face++;
+        node_2_5.face++ <--> C <--> node_1_1.face++;
+        node_2_6.face++ <--> C <--> node_1_2.face++;
+        node_2_7.face++ <--> C <--> node_1_2.face++;
+        node_2_8.face++ <--> C <--> node_1_2.face++;
 
 }

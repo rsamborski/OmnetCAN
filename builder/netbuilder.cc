@@ -127,8 +127,8 @@ void NetBuilder::buildNetwork(cModule *parent)
         cModule *destmod = nodeid2mod[destnodeid];
 
         cGate *srcIn, *srcOut, *destIn, *destOut;
-        srcmod->getOrCreateFirstUnconnectedGatePair("port", false, true, srcIn, srcOut);
-        destmod->getOrCreateFirstUnconnectedGatePair("port", false, true, destIn, destOut);
+        srcmod->getOrCreateFirstUnconnectedGatePair("face", false, true, srcIn, srcOut);
+        destmod->getOrCreateFirstUnconnectedGatePair("face", false, true, destIn, destOut);
 
         // connect
         connect(srcOut, destIn, delay, error, datarate);

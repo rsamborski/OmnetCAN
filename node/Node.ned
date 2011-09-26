@@ -1,12 +1,3 @@
-//
-// This file is part of an OMNeT++/OMNEST simulation example.
-//
-// Copyright (C) 1992-2008 Andras Varga
-//
-// This file is distributed WITHOUT ANY WARRANTY. See the file
-// `license' for details on this and other legal matters.
-//
-
 
 package omnetcan.node;
 
@@ -17,11 +8,11 @@ package omnetcan.node;
 module Node
 {
     parameters:
-        int address;
+        int address; 
         string appType;
         @display("i=misc/node_vs,gold");
     gates:
-        inout port[];
+        inout face[];
     submodules:
         app: <appType> like IApp {
             parameters:
@@ -32,21 +23,19 @@ module Node
             parameters:
                 @display("p=140,130");
             gates:
-                in[sizeof(port)];
-                out[sizeof(port)];
+                in[sizeof(face)];
+                out[sizeof(face)];
         }
-        queue[sizeof(port)]: L2Queue {
+        queue[sizeof(face)]: L2Queue {
             parameters:
                 @display("p=80,200,row");
         }
     connections:
         routing.localOut --> app.in;
         routing.localIn <-- app.out;
-        for i=0..sizeof(port)-1 {
+        for i=0..sizeof(face)-1 {
             routing.out[i] --> queue[i].in;
             routing.in[i] <-- queue[i].out;
-            queue[i].line <--> port[i];
+            queue[i].line <--> face[i];
         }
 }
-
-
