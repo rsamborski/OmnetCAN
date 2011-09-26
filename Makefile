@@ -38,21 +38,14 @@ O = $(PROJECT_OUTPUT_DIR)/$(CONFIGNAME)/$(PROJECTRELATIVE_PATH)
 OBJS = \
     $O/builder/netbuilder.o \
     $O/node/App.o \
-    $O/node/BurstyApp.o \
     $O/node/ccn.o \
     $O/node/L2Queue.o \
     $O/node/Routing.o \
-    $O/node/ContentObject_m.o \
-    $O/node/Interest_m.o \
-    $O/node/Packet_m.o \
-    $O/node/untitled_m.o
+    $O/node/Packet_m.o
 
 # Message files
 MSGFILES = \
-    node/ContentObject.msg \
-    node/Interest.msg \
-    node/Packet.msg \
-    node/untitled.msg
+    node/Packet.msg
 
 #------------------------------------------------------------------------------
 
@@ -129,7 +122,18 @@ depend:
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 $O/builder/netbuilder.o: builder/netbuilder.cc
+$O/node/untitled_m.o: node/untitled_m.cc \
+	node/untitled_m.h
+$O/node/ContentObject_m.o: node/ContentObject_m.cc \
+	node/ContentObject_m.h \
+	node/ccn.h
+$O/node/Interest_m.o: node/Interest_m.cc \
+	node/Interest_m.h \
+	node/ccn.h
 $O/node/Routing.o: node/Routing.cc \
+	node/Packet_m.h \
+	node/ccn.h
+$O/node/BurstyApp.o: node/BurstyApp.cc \
 	node/Packet_m.h \
 	node/ccn.h
 $O/node/L2Queue.o: node/L2Queue.cc

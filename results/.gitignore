@@ -1,0 +1,5 @@
+# Lista ignorowanych plikow/katalogow
+*.elog
+*.sca
+*.vci
+*.vec
