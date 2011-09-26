@@ -38,14 +38,21 @@ O = $(PROJECT_OUTPUT_DIR)/$(CONFIGNAME)/$(PROJECTRELATIVE_PATH)
 OBJS = \
     $O/builder/netbuilder.o \
     $O/node/App.o \
+    $O/node/BurstyApp.o \
     $O/node/ccn.o \
     $O/node/L2Queue.o \
     $O/node/Routing.o \
-    $O/node/Packet_m.o
+    $O/node/ContentObject_m.o \
+    $O/node/Interest_m.o \
+    $O/node/Packet_m.o \
+    $O/node/untitled_m.o
 
 # Message files
 MSGFILES = \
-    node/Packet.msg
+    node/ContentObject.msg \
+    node/Interest.msg \
+    node/Packet.msg \
+    node/untitled.msg
 
 #------------------------------------------------------------------------------
 
