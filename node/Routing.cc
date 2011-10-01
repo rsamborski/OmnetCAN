@@ -125,9 +125,10 @@ void Routing::handleMessage(cMessage *msg)
         	if(incoming_face == -1) {
         		// set to local delivery
         		fl.local_delivery = true;
+            	EV << "setting local_delivery to PendindInterestTable for contentId " << contentId << endl;
         	} else if(! fl.faces[incoming_face]) {
            		fl.faces[incoming_face] = true;
-            	EV << "adding face " << incoming_face << " to PendindInterestTable for contentId " << contentId << endl;
+            	EV << "setting face " << incoming_face << " in PendindInterestTable for contentId " << contentId << endl;
            	} else {
            		EV << "face " << incoming_face << " already in PendindInterestTable for contentId " << contentId << endl;
         	}
@@ -140,8 +141,10 @@ void Routing::handleMessage(cMessage *msg)
 
         	if(incoming_face == -1) {
         		fl.local_delivery = true;
+        		EV << "setting local_delivery to PendindInterestTable for contentId " << contentId << endl;
         	} else {
         		fl.faces[incoming_face] = true;
+        		EV << "setting face " << incoming_face << " in PendindInterestTable for contentId " << contentId << endl;
         	}
 
          	pit.insert(std::pair<int, FaceList>(contentId, fl));
