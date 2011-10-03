@@ -1,10 +1,12 @@
 //
-// This file is part of an OMNeT++/OMNEST simulation example.
+// Project: OmnetCAN
+// Description: Content Aware Network simulation for Omnet++, based on CCN architecture
+// Author: Remigiusz Samborski
 //
-// Copyright (C) 1992-2008 Andras Varga
+// Based on an OMNeT++/OMNEST simulation example. Copyright (C) 1992-2008 Andras Varga
 //
 // This file is distributed WITHOUT ANY WARRANTY. See the file
-// `license' for details on this and other legal matters.
+// `license.txt` for details on this and other legal matters.
 //
 
 #ifdef _MSC_VER

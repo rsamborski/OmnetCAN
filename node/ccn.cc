@@ -1,3 +1,10 @@
+//
+// Project: OmnetCAN
+// Description: Content Aware Network simulation for Omnet++, based on CCN architecture
+// Author: Remigiusz Samborski
+//
+
+#include <time.h>
 #include "ccn.h"
 
 /*
@@ -9,4 +16,5 @@ FaceList::FaceList() {
 	}
 
 	local_delivery = false;
+	lastUpdate = 0;
 }

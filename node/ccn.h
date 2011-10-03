@@ -1,9 +1,8 @@
-/*
- * ccn.h
- *
- *  Created on: 2011-07-24
- *      Author: remik
- */
+//
+// Project: OmnetCAN
+// Description: Content Aware Network simulation for Omnet++, based on CCN architecture
+// Author: Remigiusz Samborski
+//
 
 #ifndef CCN_H_
 #define CCN_H_
@@ -33,6 +32,7 @@ class FaceList {
 	public:
 		int faces[MAX_FACES];
 		bool local_delivery;
+		time_t lastUpdate;
 
 		FaceList ();
 };
