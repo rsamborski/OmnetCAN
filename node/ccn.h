@@ -32,7 +32,7 @@ class FaceList {
 	public:
 		int faces[MAX_FACES];
 		bool local_delivery;
-		time_t lastUpdate;
+		double lastUpdate;
 
 		FaceList ();
 };

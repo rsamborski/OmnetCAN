@@ -4,7 +4,9 @@
 // Author: Remigiusz Samborski
 //
 
-#include <time.h>
+//#include <time.h>
+#include <simtime.h>
+#include <simtime_t.h>
 #include "ccn.h"
 
 /*

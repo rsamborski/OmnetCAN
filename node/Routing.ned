@@ -19,7 +19,7 @@ simple Routing
     parameters:
         int localContentId;
         volatile int packetLength @unit(byte);  // length of one message (fixed! no "volatile" modifier)
-        int pitTimeout;
+        double pitTimeout;
                         
         @display("i=block/switch");
         @signal[drop](type="long");				// emited when packet is droped

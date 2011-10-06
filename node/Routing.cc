@@ -15,7 +15,7 @@
 
 #include <map>
 #include <omnetpp.h>
-#include <time.h>
+//#include <time.h>
 
 #include "ccn.h"
 #include "Packet_m.h"
@@ -28,7 +28,7 @@ class Routing : public cSimpleModule
   private:
 	int myAddress;
 	int localContentId; 	// local content available from this node, TODO: change to std::map
-	time_t pitTimeout;			// timeout for PIT entries in ms
+	double pitTimeout;			// timeout for PIT entries in ms
 
 	typedef std::map <int, ContentObject> ContentObjects;
 //	ContentObjects localStore;		// table of local CCN data objects
@@ -47,7 +47,10 @@ class Routing : public cSimpleModule
     long datapkCounter;
     cPar *packetLengthBytes;
 
+    // event message used to schedule PIT cleaning
+    cMessage* cleanPITevent;
 
+    // signals used in data statistics
     simsignal_t dropSignal;
     simsignal_t dropInterestSignal;
 
@@ -71,7 +74,6 @@ void Routing::initialize()
     localContentId = par("localContentId");
     packetLengthBytes = &par("packetLength");
     pitTimeout = par("pitTimeout");
-
 
     dropSignal = registerSignal("drop");
     dropInterestSignal = registerSignal("dropInterest");
@@ -104,6 +106,10 @@ void Routing::initialize()
     }
 
     delete topo;
+
+    // we set up a scheduler to run timers cleaning, first 0.5 is used for enviroment set up
+    cleanPITevent= new cMessage("cleanPIT");
+    scheduleAt(simTime()+0.5+pitTimeout/2,cleanPITevent);
 }
 
 void Routing::handleMessage(cMessage *msg)
@@ -114,6 +120,12 @@ void Routing::handleMessage(cMessage *msg)
 
 	// Set the default Node color
 	getParentModule()->getDisplayString().setTagArg("i",1,"gold");
+
+	// if the message is our timer, we run the function and return
+	if(strcmp(msg->getName(), "cleanPIT") == 0) {
+		cleanPIT();
+		return;
+	}
 
 	// get the Packet
     Packet *pk = check_and_cast<Packet *>(msg);
@@ -149,7 +161,7 @@ void Routing::handleMessage(cMessage *msg)
            		EV << "face " << incoming_face << " already in PendindInterestTable for contentId " << contentId << endl;
         	}
 
-        	fl.lastUpdate = time(NULL);
+        	fl.lastUpdate = simTime().dbl();
 			itp->second = fl;
 
         	// we don't forward the interest - it has been already forwarded
@@ -167,7 +179,7 @@ void Routing::handleMessage(cMessage *msg)
         		EV << "setting face " << incoming_face << " in PendindInterestTable for contentId " << contentId << endl;
         	}
 
-        	fl.lastUpdate = time(NULL);
+        	fl.lastUpdate = simTime().dbl();
          	pit.insert(std::pair<int, FaceList>(contentId, fl));
         }
 
@@ -249,16 +261,13 @@ void Routing::handleMessage(cMessage *msg)
     	/* Drop the original packet */
     	delete pk;
     }
-
-    // We remove old entries from PIT
-    cleanPIT();
 }
 
 // Function cleans PIT table by removing entries, which reached timeOut
 void Routing::cleanPIT() {
-	PendingInterestTable::iterator p;
+	PendingInterestTable::iterator p, toDelete;
 	FaceList fl;
-	time_t matchOlder = time(NULL) - pitTimeout;
+	double matchOlder = simTime().dbl() - pitTimeout;
 
 	for(p = pit.begin(); p!=pit.end(); ++p)
 	{
@@ -267,9 +276,13 @@ void Routing::cleanPIT() {
 		if(fl.lastUpdate < matchOlder) {
 			// we remove this entry
 			EV << "erasing PIT entry for contentID: " << p->first << endl;
-			pit.erase(p);
+			toDelete = p++;
+			pit.erase(toDelete);
 		}
 	}
+
+	// schedule next cleaning
+	scheduleAt(simTime()+pitTimeout/2,cleanPITevent);
 }
 
 // Returns number of the incoming face for the attached packet
