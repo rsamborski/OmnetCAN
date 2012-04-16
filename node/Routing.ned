@@ -25,7 +25,7 @@ simple Routing
         @signal[drop](type="long");				// emited when packet is droped
         @signal[dropInterest](type="long");		// emited when an Interest packet is dropped (another one was already sent)
         @statistic[drop](title="dropped packet byte length";unit=bytes;record=vector,count,sum;interpolationmode=none);
-        @statistic[dropInterest](title="dropped Interest packets byte length";unit=bytes;record=vector,count,sum;interpolationmode=none);
+        @statistic[dropInterest](title="dropped Interest packets byte length";unit=bytes;record=vector,count,sum,histogram;interpolationmode=none);
 //        @statistic[outputIf](title="packet content receiver";record=histogram;interpolationmode=none);
   
     gates:

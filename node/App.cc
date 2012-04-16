@@ -43,6 +43,7 @@ class App : public cSimpleModule
     simsignal_t dropSignal;
     simsignal_t contentReceivedSignal;
 
+    simtime_t czas_nadania;
 
   public:
     App();
@@ -106,6 +107,7 @@ void App::handleMessage(cMessage *msg)
         char pkname[40];
         sprintf(pkname,"interest-from-%d-cid-%d-#%ld", myAddress, searchContentId, pkCounter++);
         EV << "generating Interest packet: " << pkname << endl;
+        czas_nadania = simTime();
 
         Packet *pk = new Packet(pkname);
         pk->setByteLength(packetLengthBytes->longValue());
@@ -137,7 +139,7 @@ void App::handleMessage(cMessage *msg)
         	}
         } else if(pk->getPacketType() == PACKET_DATA) {
         	if(pk->getContentId() == searchContentId) {
-        		emit(endToEndDelaySignal, simTime() - pk->getCreationTime());
+        		emit(endToEndDelaySignal, simTime() - czas_nadania);
    	        	emit(contentReceivedSignal, searchContentId);
 
    	        	if (ev.isGUI())

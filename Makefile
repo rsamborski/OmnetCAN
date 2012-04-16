@@ -69,10 +69,20 @@ include $(CONFIGFILE)
 
 # Simulation kernel and user interface libraries
 OMNETPP_LIB_SUBDIR = $(OMNETPP_LIB_DIR)/$(TOOLCHAIN_NAME)
-OMNETPP_LIBS = -L"$(OMNETPP_LIB_SUBDIR)" -L"$(OMNETPP_LIB_DIR)" $(USERIF_LIBS) $(KERNEL_LIBS) $(SYS_LIBS)
+OMNETPP_LIBS = -L"$(OMNETPP_LIB_SUBDIR)" -L"$(OMNETPP_LIB_DIR)" -loppmain$D $(USERIF_LIBS) $(KERNEL_LIBS) $(SYS_LIBS)
 
 COPTS = $(CFLAGS)  $(INCLUDE_PATH) -I$(OMNETPP_INCL_DIR)
 MSGCOPTS = $(INCLUDE_PATH)
+
+# we want to recompile everything if COPTS changes,
+# so we store COPTS into $COPTS_FILE and have object
+# files depend on it (except when "make depend" was called)
+COPTS_FILE = $O/.last-copts
+ifneq ($(MAKECMDGOALS),depend)
+ifneq ("$(COPTS)","$(shell cat $(COPTS_FILE) 2>/dev/null || echo '')")
+$(shell $(MKPATH) "$O" && echo "$(COPTS)" >$(COPTS_FILE))
+endif
+endif
 
 #------------------------------------------------------------------------------
 # User-supplied makefile fragment(s)
@@ -88,13 +98,13 @@ $(TARGET) : $O/$(TARGET)
 
 $O/$(TARGET): $(OBJS)  $(wildcard $(EXTRA_OBJS)) Makefile
 	@$(MKPATH) $O
-	$(CXX) $(LDFLAGS) -o $O/$(TARGET)  $(OBJS) $(EXTRA_OBJS) $(WHOLE_ARCHIVE_ON) $(LIBS) $(WHOLE_ARCHIVE_OFF) $(OMNETPP_LIBS)
+	$(CXX) $(LDFLAGS) -o $O/$(TARGET)  $(OBJS) $(EXTRA_OBJS) $(AS_NEEDED_OFF) $(WHOLE_ARCHIVE_ON) $(LIBS) $(WHOLE_ARCHIVE_OFF) $(OMNETPP_LIBS)
 
 .PHONY:
 
 .SUFFIXES: .cc
 
-$O/%.o: %.cc
+$O/%.o: %.cc $(COPTS_FILE)
 	@$(MKPATH) $(dir $@)
 	$(CXX) -c $(COPTS) -o $@ $<
 
@@ -122,16 +132,16 @@ depend:
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 $O/builder/netbuilder.o: builder/netbuilder.cc
-$O/node/Routing.o: node/Routing.cc \
-	node/Packet_m.h \
-	node/ccn.h
-$O/node/L2Queue.o: node/L2Queue.cc
 $O/node/App.o: node/App.cc \
 	node/Packet_m.h \
 	node/ccn.h
-$O/node/ccn.o: node/ccn.cc \
-	node/ccn.h
+$O/node/L2Queue.o: node/L2Queue.cc
 $O/node/Packet_m.o: node/Packet_m.cc \
 	node/Packet_m.h \
+	node/ccn.h
+$O/node/Routing.o: node/Routing.cc \
+	node/Packet_m.h \
+	node/ccn.h
+$O/node/ccn.o: node/ccn.cc \
 	node/ccn.h
 

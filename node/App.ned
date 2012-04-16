@@ -16,7 +16,7 @@ simple App like IApp
         @signal[hopCount](type="int");
         @signal[sourceAddress](type="int");
         @signal[contentReceived](type="int");  
-        @statistic[endToEndDelay](title="end-to-end delay of arrived packets";unit=s;interpolationmode=none);
+        @statistic[endToEndDelay](title="end-to-end delay of arrived packets";unit=s;record=vector,count,sum;interpolationmode=none); //dodano :record=vector,count,sum
         @statistic[hopCount](title="hop count of arrived packets";interpolationmode=none);
         @statistic[sourceAddress](title="source address of arrived packets";interpolationmode=none);
     gates:
