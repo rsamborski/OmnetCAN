@@ -245,8 +245,9 @@ void Routing::handleMessage(cMessage *msg)
         	pit.erase(pit.find(contentId));
 
         	emit(dropSignal, (long)pk->getByteLength());
-        	delete pk;
         }
+
+        delete pk; // fix do bledu
     }
     else if (packetType == PACKET_DATA)
     {
