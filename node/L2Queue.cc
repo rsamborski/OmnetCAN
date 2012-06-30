@@ -24,12 +24,12 @@ class L2Queue : public cSimpleModule
     cQueue queue;
     cMessage *endTransmissionEvent;
 
-    simsignal_t qlenSignal;
-    simsignal_t busySignal;
-    simsignal_t queueingTimeSignal;
-    simsignal_t dropSignal;
-    simsignal_t txBytesSignal;
-    simsignal_t rxBytesSignal;
+//    simsignal_t qlenSignal;
+//    simsignal_t busySignal;
+//    simsignal_t queueingTimeSignal;
+//    simsignal_t dropSignal;
+//    simsignal_t txBytesSignal;
+//    simsignal_t rxBytesSignal;
 
   public:
     L2Queue();
@@ -63,7 +63,7 @@ void L2Queue::initialize()
 
     frameCapacity = par("frameCapacity");
 
-    qlenSignal = registerSignal("qlen");
+/*    qlenSignal = registerSignal("qlen");
     busySignal = registerSignal("busy");
     queueingTimeSignal = registerSignal("queueingTime");
     dropSignal = registerSignal("drop");
@@ -71,7 +71,7 @@ void L2Queue::initialize()
     rxBytesSignal = registerSignal("rxBytes");
 
     emit(qlenSignal, queue.length());
-    emit(busySignal, 0);
+    emit(busySignal, 0);*/
 }
 
 void L2Queue::startTransmitting(cMessage *msg)
@@ -81,7 +81,7 @@ void L2Queue::startTransmitting(cMessage *msg)
     EV << "Starting transmission of " << msg << endl;
     send(msg, "line$o");
 
-    emit(txBytesSignal, (long)check_and_cast<cPacket *>(msg)->getByteLength());
+    //emit(txBytesSignal, (long)check_and_cast<cPacket *>(msg)->getByteLength());
 
     // Schedule an event for the time when last bit will leave the gate.
     simtime_t endTransmission = gate("line$o")->getTransmissionChannel()->getTransmissionFinishTime();
@@ -97,20 +97,20 @@ void L2Queue::handleMessage(cMessage *msg)
         if (ev.isGUI()) displayStatus(false);
         if (queue.empty())
         {
-            emit(busySignal, 0);
+      //      emit(busySignal, 0);
         }
         else
         {
             msg = (cMessage *) queue.pop();
-            emit(queueingTimeSignal, simTime() - msg->getTimestamp());
-            emit(qlenSignal, queue.length());
+        //    emit(queueingTimeSignal, simTime() - msg->getTimestamp());
+        //    emit(qlenSignal, queue.length());
             startTransmitting(msg);
         }
     }
     else if (msg->arrivedOn("line$i"))
     {
         // pass up
-        emit(rxBytesSignal, (long)check_and_cast<cPacket *>(msg)->getByteLength());
+        //emit(rxBytesSignal, (long)check_and_cast<cPacket *>(msg)->getByteLength());
         send(msg,"out");
     }
     else // arrived on gate "in"
@@ -121,7 +121,7 @@ void L2Queue::handleMessage(cMessage *msg)
             if (frameCapacity && queue.length()>=frameCapacity)
             {
                 EV << "Received " << msg << " but transmitter busy and queue full: discarding\n";
-                emit(dropSignal, (long)check_and_cast<cPacket *>(msg)->getByteLength());
+          //      emit(dropSignal, (long)check_and_cast<cPacket *>(msg)->getByteLength());
                 delete msg;
             }
             else
@@ -129,16 +129,16 @@ void L2Queue::handleMessage(cMessage *msg)
                 EV << "Received " << msg << " but transmitter busy: queueing up\n";
                 msg->setTimestamp();
                 queue.insert(msg);
-                emit(qlenSignal, queue.length());
+//                emit(qlenSignal, queue.length());
             }
         }
         else
         {
             // We are idle, so we can start transmitting right away.
             EV << "Received " << msg << endl;
-            emit(queueingTimeSignal, 0.0);
+//            emit(queueingTimeSignal, 0.0);
             startTransmitting(msg);
-            emit(busySignal, 1);
+//            emit(busySignal, 1);
         }
     }
 }

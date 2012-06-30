@@ -70,23 +70,15 @@ App::~App()
 void App::initialize()
 {
     myAddress = par("address");
-    searchContentId = par("searchContentId");
+
+    EV << "searchContentID for node " << myAddress << " : " << searchContentId << "." << endl;
+
     packetLengthBytes = &par("packetLength");
     sendIATime = &par("sendIaTime");  // volatile parameter
     pkCounter = 0;
 
     WATCH(pkCounter);
     WATCH(myAddress);
-
-/*    const char *destAddressesPar = par("destAddresses");
-    cStringTokenizer tokenizer(destAddressesPar);
-    const char *token;
-    while ((token = tokenizer.nextToken())!=NULL)
-        destAddresses.push_back(atoi(token));
-
-    if (destAddresses.size() == 0)
-        throw cRuntimeError("At least one address must be specified in the destAddresses parameter!");
-*/
 
     generatePacket = new cMessage("nextPacket");
     scheduleAt(sendIATime->doubleValue(), generatePacket);
@@ -102,7 +94,10 @@ void App::handleMessage(cMessage *msg)
     if (msg == generatePacket)
     {
         // Sending packet
-        //int destAddress = destAddresses[intuniform(0, destAddresses.size()-1)];
+        searchContentId = intuniform((int) par("searchContentIdLowerBound"), (int) par("searchContentIdUpperBound"));
+        EV << "searchContentId: " << searchContentId << endl;
+
+        if(searchContentId == 0) return; // jesli zero to nie szukamy nic
 
         char pkname[40];
         sprintf(pkname,"interest-from-%d-cid-%d-#%ld", myAddress, searchContentId, pkCounter++);
@@ -113,8 +108,6 @@ void App::handleMessage(cMessage *msg)
         pk->setByteLength(packetLengthBytes->longValue());
         pk->setContentId(searchContentId);
         pk->setPacketType(PACKET_INTEREST);
-//        pk->setSrcAddr(myAddress);
-//        pk->setDestAddr(destAddress);
         send(pk,"out");
 
         scheduleAt(simTime() + sendIATime->doubleValue(), generatePacket);
@@ -138,7 +131,7 @@ void App::handleMessage(cMessage *msg)
         		getParentModule()->bubble("ERROR: interest delivered to app!");
         	}
         } else if(pk->getPacketType() == PACKET_DATA) {
-        	if(pk->getContentId() == searchContentId) {
+//        	if(pk->getContentId() == searchContentId) {     Dla uproszczenia zakladamy ze zawsze trafia do nas wlasciwy Content, aby nie pamietac historii losowanych liczb
         		emit(endToEndDelaySignal, simTime() - czas_nadania);
    	        	emit(contentReceivedSignal, searchContentId);
 
@@ -147,7 +140,7 @@ void App::handleMessage(cMessage *msg)
    	        		getParentModule()->getDisplayString().setTagArg("i",1,"green");
    	        		getParentModule()->bubble("Content arrived!");
    	        	}
-        	} else {
+/*        	} else {
    	        	emit(contentReceivedSignal, -1); // wrong content
 
    	        	if (ev.isGUI())
@@ -155,10 +148,9 @@ void App::handleMessage(cMessage *msg)
    	        		getParentModule()->getDisplayString().setTagArg("i",1,"red");
    	        		getParentModule()->bubble("ERROR: wrong content arrived!");
    	        	}
-        	}
+        	}*/
 
         	delete pk;
-
 
         }
     }

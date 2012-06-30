@@ -1,4 +1,3 @@
 # Partial Tkenv config file -- see $HOME/.tkenvrc as well
-inspector "Simple_tree" "Simple_tree" "2" "568x516+750+38:normal"
 inspector "Net60" "Net60" "2" "1021x556+198+198:normal"
 

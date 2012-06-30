@@ -24,15 +24,23 @@ simple Routing
         @display("i=block/switch");
         @signal[drop](type="long");				// emited when packet is droped
         @signal[dropInterest](type="long");		// emited when an Interest packet is dropped (another one was already sent)
-        @statistic[drop](title="dropped packet byte length";unit=bytes;record=vector,count,sum;interpolationmode=none);
-        @statistic[dropInterest](title="dropped Interest packets byte length";unit=bytes;record=vector,count,sum,histogram;interpolationmode=none);
+        @signal[hopToContent](type="int");		// emited when packet goes betveen nodes
+        @statistic[drop](title="dropped packet byte length"; unit=bytes; record=vector,count,sum; interpolationmode=none);
+        @statistic[dropInterest](title="dropped Interest packets byte length"; unit=bytes; record=vector,count,sum; interpolationmode=none);
+        @statistic[hopToContent](title="data found after x hops"; record=vector,sum,mean,count,histogram; interpolationmode=none);
 //        @statistic[outputIf](title="packet content receiver";record=histogram;interpolationmode=none);
-  
+
     gates:
+
         input in[];
         output out[];
+
         input localIn;
         output localOut;
+
+        input storeIn;
+        output storeOut;
+
 }
 
 

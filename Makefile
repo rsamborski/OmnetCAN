@@ -39,7 +39,10 @@ OBJS = \
     $O/builder/netbuilder.o \
     $O/node/App.o \
     $O/node/ccn.o \
+    $O/node/ContentStore.o \
     $O/node/L2Queue.o \
+    $O/node/LFUContentStore.o \
+    $O/node/LRUContentStore.o \
     $O/node/Routing.o \
     $O/node/Packet_m.o
 
@@ -135,7 +138,21 @@ $O/builder/netbuilder.o: builder/netbuilder.cc
 $O/node/App.o: node/App.cc \
 	node/Packet_m.h \
 	node/ccn.h
+$O/node/ContentStore.o: node/ContentStore.cc \
+	node/ContentStore.h \
+	node/Packet_m.h \
+	node/ccn.h
 $O/node/L2Queue.o: node/L2Queue.cc
+$O/node/LFUContentStore.o: node/LFUContentStore.cc \
+	node/ContentStore.h \
+	node/LFUContentStore.h \
+	node/Packet_m.h \
+	node/ccn.h
+$O/node/LRUContentStore.o: node/LRUContentStore.cc \
+	node/ContentStore.h \
+	node/LRUContentStore.h \
+	node/Packet_m.h \
+	node/ccn.h
 $O/node/Packet_m.o: node/Packet_m.cc \
 	node/Packet_m.h \
 	node/ccn.h

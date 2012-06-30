@@ -54,6 +54,18 @@ class Routing : public cSimpleModule
     simsignal_t dropSignal;
     simsignal_t dropInterestSignal;
 
+        // We measure the performance by the running average of the ratio on hops saved from each request with in-network caching:
+        // Hop gain ratio = hopToContent / hopToContent
+
+        // -- Number of hops to hit requested content (with cache)
+        // The hops needed for content to be sent from the nearest cache store to the client.
+        // Higher gain is signified by smaller ratio.
+        simsignal_t hopToContentSignal;
+
+        // -- Number of hops to the content server (without cache)
+        // The hops needed for content to be sent from initial server to the client if a matching cache is available.
+        // If no matching cache is found along the delivery path, then the ratio equals one (i.e., no gain).
+        simsignal_t hopToContentServerSignal;
 
   protected:
     virtual void initialize();
@@ -78,6 +90,10 @@ void Routing::initialize()
 
     dropSignal = registerSignal("drop");
     dropInterestSignal = registerSignal("dropInterest");
+
+    hopToContentSignal = registerSignal("hopToContent");
+    hopToContentServerSignal = registerSignal("hopToContentServer");
+
 //    contentReceivedSignal = registerSignal("contentReceived");
 
     generatePacket = NULL;
@@ -137,72 +153,82 @@ void Routing::handleMessage(cMessage *msg)
     {
     	/* Interest packet behavior */
         EV << "Interest packet received " << pk->getName() << " on face " << incoming_face << endl;
+        //if not from content store
+
+        if (strcmp(pk->getArrivalGate()->getName(), "storeIn") != 0) {
+            pk->increaseHopToContent();
+            EV << "Hop count for packet #" << pk->getContentId() << " is: " << pk->getHopToContent() << endl;
+
+//            // Interest packet behavior
+//            pk->increaseHopToContent();
+//            EV << "Interest packet received " << pk->getName() << " on face " << incoming_face << endl;
 
 
-        /* Check the PendingInterestTable */
-        PendingInterestTable::iterator itp = pit.find(contentId);
+            // Check the PendingInterestTable
+            PendingInterestTable::iterator itp = pit.find(contentId);
 
-        if(itp!=pit.end())
-        {
-        	EV << "contentId " << contentId << " found in PendingInterestTable" << endl;
+            if(itp!=pit.end())
+            {
+                EV << "contentId " << contentId << " found in PendingInterestTable" << endl;
 
-        	fl = (*itp).second;
+                fl = (*itp).second;
 
-        	if(incoming_face == -1) {
-        		// set to local delivery
-        		fl.local_delivery = true;
-            	EV << "setting local_delivery to PendindInterestTable for contentId " << contentId << endl;
-        	} else if(! fl.faces[incoming_face]) {
-           		fl.faces[incoming_face] = true;
-            	EV << "setting face " << incoming_face << " in PendindInterestTable for contentId " << contentId << endl;
-           	} else {
-           		EV << "face " << incoming_face << " already in PendindInterestTable for contentId " << contentId << endl;
-        	}
+                if(incoming_face == -1) {
+                    // set to local delivery
+                    fl.local_delivery = true;
+                    EV << "setting local_delivery to PendindInterestTable for contentId " << contentId << endl;
+                } else if(! fl.faces[incoming_face]) {
+                    fl.faces[incoming_face] = true;
+                    EV << "setting face " << incoming_face << " in PendindInterestTable for contentId " << contentId << endl;
+                } else {
+                    EV << "face " << incoming_face << " already in PendindInterestTable for contentId " << contentId << endl;
+                }
 
-        	fl.lastUpdate = simTime().dbl();
-			itp->second = fl;
+                fl.lastUpdate = simTime().dbl();
+                itp->second = fl;
 
-        	// we don't forward the interest - it has been already forwarded
-        	emit(dropInterestSignal, (long)pk->getByteLength());
-        	delete pk;
-        	return;
-        } else {
-        	EV << "contentId " << contentId << " NOT found in PendingInterestTable, adding new entry" << endl;
+                // we don't forward the interest - it has been already forwarded
+                emit(dropInterestSignal, (long)pk->getByteLength());
+                delete pk;
+                return;
+            } else {
+                EV << "contentId " << contentId << " NOT found in PendingInterestTable, adding new entry" << endl;
 
-        	if(incoming_face == -1) {
-        		fl.local_delivery = true;
-        		EV << "setting local_delivery to PendindInterestTable for contentId " << contentId << endl;
-        	} else {
-        		fl.faces[incoming_face] = true;
-        		EV << "setting face " << incoming_face << " in PendindInterestTable for contentId " << contentId << endl;
-        	}
+                if(incoming_face == -1) {
+                    fl.local_delivery = true;
+                    EV << "setting local_delivery to PendindInterestTable for contentId " << contentId << endl;
+                } else {
+                    fl.faces[incoming_face] = true;
+                    EV << "setting face " << incoming_face << " in PendindInterestTable for contentId " << contentId << endl;
+                }
 
-        	fl.lastUpdate = simTime().dbl();
-         	pit.insert(std::pair<int, FaceList>(contentId, fl));
-        }
-
-
-        /* We check if the content is available locally */
-		if(contentId == localContentId) {
-        	EV << "contentId " << contentId << " available locally, we generate Data Packet in response" << endl;
-
-        	if (ev.isGUI()) {
-        		getParentModule()->bubble("Content available at this node! Sending to faces from PIT.");
-        	}
-
-        	/* Send the content */
-        	Packet *datapk = newDataPacket(contentId);
-        	sendToPIT(datapk);
-        	delete(datapk);
-
-        	/* Drop interest packet */
-        	delete pk;
-        	return;
-		}
+                fl.lastUpdate = simTime().dbl();
+                pit.insert(std::pair<int, FaceList>(contentId, fl));
+            }
 
 
-        /* Check local cache (Content Store) */
-        /* TODO */
+            /* We check if the content is available locally */
+            if(contentId == localContentId) {
+                EV << "contentId " << contentId << " available locally, we generate Data Packet in response" << endl;
+
+                if (ev.isGUI()) {
+                    getParentModule()->bubble("Content available at this node! Sending to faces from PIT.");
+                }
+
+                /* Send the content */
+                Packet *datapk = newDataPacket(contentId);
+                sendToPIT(datapk);
+                delete(datapk);
+
+                /* Drop interest packet */
+                delete pk;
+                return;
+            }
+
+            send(pk, "storeOut");
+            return;
+
+        }  //  if (strcmp(pk->getArrivalGate()->getName(), "storeIn") != 0) ...
 
 
 		/* Check the Forwarding Table */
@@ -222,10 +248,12 @@ void Routing::handleMessage(cMessage *msg)
 
         fl = (*itf).second;
         bool forwarded = false;
+        PendingInterestTable::iterator itp = pit.find(contentId);
+        FaceList waitingFaces= itp->second;
 
         for(int i=0;i<MAX_FACES;i++) {
-        	/* We skip the gate from which the packet came */
-        	if(i == incoming_face) continue;
+        	/* We skip the gates which are set pending for this content */
+            if(waitingFaces.faces[i]) continue;
 
         	if(fl.faces[i]) {
         		EV << "Forwarding Interest Packet: " << pk->getName() << " on face " << i << endl;
@@ -253,6 +281,16 @@ void Routing::handleMessage(cMessage *msg)
     {
     	/* Data packet behavior */
         EV << "Data Packet received: " << pk->getName() << endl;
+
+        //if not from content store send to it
+        if (strcmp(pk->getArrivalGate()->getName(), "storeIn") != 0) {
+            Packet* datapk = new Packet(*pk);
+            send(datapk, "storeOut");
+            EV << "Data sent to store in cache." << endl;
+        } else {
+            emit(hopToContentSignal, pk->getHopToContent());
+            //EV << "Data packet " << pk->getName() << " returned from contentStore " << endl;
+        }
 
     	/* Send the content further */
         sendToPIT(pk);

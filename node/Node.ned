@@ -30,9 +30,20 @@ module Node
             parameters:
                 @display("p=80,200,row");
         }
+
+        lfuContentStore: LRUContentStore {
+            parameters:
+                @display("p=229,130");
+        }
+
     connections:
         routing.localOut --> app.in;
         routing.localIn <-- app.out;
+
+		// connection with content store
+        routing.storeIn <-- lfuContentStore.out;
+        routing.storeOut --> lfuContentStore.in;
+
         for i=0..sizeof(face)-1 {
             routing.out[i] --> queue[i].in;
             routing.in[i] <-- queue[i].out;
