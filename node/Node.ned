@@ -8,7 +8,7 @@ package omnetcan.node;
 module Node
 {
     parameters:
-        int address; 
+        int address;
         string appType;
         @display("i=misc/node_vs,gold");
     gates:
@@ -31,7 +31,7 @@ module Node
                 @display("p=80,200,row");
         }
 
-        lfuContentStore: LRUContentStore {
+        contentStore: LRUContentStore {
             parameters:
                 @display("p=229,130");
         }
@@ -41,8 +41,8 @@ module Node
         routing.localIn <-- app.out;
 
 		// connection with content store
-        routing.storeIn <-- lfuContentStore.out;
-        routing.storeOut --> lfuContentStore.in;
+        routing.storeIn <-- contentStore.out;
+        routing.storeOut --> contentStore.in;
 
         for i=0..sizeof(face)-1 {
             routing.out[i] --> queue[i].in;
