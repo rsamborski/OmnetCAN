@@ -1,3 +1,5 @@
 # Partial Tkenv config file -- see $HOME/.tkenvrc as well
+inspector "Ring" "Ring" "2" "675x713+0+0:normal"
 inspector "Net60" "Net60" "2" "1021x556+198+198:normal"
+inspector "Extended_Tree" "Extended_Tree" "2" "675x713+0+0:normal"
 
