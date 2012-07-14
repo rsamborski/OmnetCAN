@@ -30,11 +30,11 @@ simple LRUContentStore like ContentStore {
 		@statistic[dataHit](title="packet found in content store";record=vector,count,sum;interpolationmode=none);
 		@statistic[dataMiss](title="packet NOT found in content store";record=vector,count,sum;interpolationmode=none);
 		@statistic[dataAll](title="all packets sent to content store";record=vector,count,sum;interpolationmode=none);
-		@statistic[hitRatio](source="count(dataHit)/count(dataAll)";title="packet hit ratio in content store";record=mean);
+//		@statistic[hitRatio](source="count(dataHit)/count(dataAll)";title="packet hit ratio in content store";record=stats,vector;interpolationmode=none);
 		//@statistic[csDataLookup](title="searching packet in content store";record=vector,count,sum;interpolationmode=none);
 		@statistic[csDataStore](title="data stored in content store";record=vector,count,sum;interpolationmode=none);
 		@statistic[csDataExchange](title="data replaced in content store";record=vector,count,sum;interpolationmode=none);
-		@statistic[exchangeRatio](source="count(csDataExchange)/count(csDataStore)";title="Cache exchange ratio";record=mean);
+//		@statistic[exchangeRatio](source="count(csDataExchange)/count(csDataStore)";title="Cache exchange ratio";record=stats,vector;interpolationmode=none);
 		
 	gates:
 	    input in;
