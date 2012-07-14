@@ -84,93 +84,153 @@ network Irregular
                 @display("p=360,222");
         }
         node15: Node {
+            parameters:
+                address = 15;
             @display("p=360,25");
         }
         node10: Node {
+            parameters:
+                address = 10;
             @display("p=185,394");
         }
         node18: Node {
+            parameters:
+                address = 18;
             @display("p=102,454");
         }
         node38: Node {
+            parameters:
+                address = 38;
             @display("p=195,520");
         }
         node37: Node {
+            parameters:
+                address = 37;
             @display("p=327,540");
         }
         node35: Node {
+            parameters:
+                address = 35;
             @display("p=455,552");
         }
         node33: Node {
+            parameters:
+                address = 33;
             @display("p=406,439");
         }
         node34: Node {
+            parameters:
+                address = 34;
             @display("p=279,440");
         }
         node11: Node {
+            parameters:
+                address = 11;
             @display("p=562,582");
         }
         node12: Node {
+            parameters:
+                address = 12;
             @display("p=654,531");
         }
         node13: Node {
+            parameters:
+                address = 13;
             @display("p=731,433");
         }
         node14: Node {
+            parameters:
+                address = 14;
             @display("p=754,561");
         }
         node16: Node {
+            parameters:
+                address = 16;
             @display("p=711,316");
         }
         node17: Node {
+            parameters:
+                address = 17;
             @display("p=606,363");
         }
         node19: Node {
+            parameters:
+                address = 19;
             @display("p=531,296");
         }
         node20: Node {
+            parameters:
+                address = 20;
             @display("p=526,460");
         }
         node21: Node {
+            parameters:
+                address = 21;
             @display("p=625,459");
         }
         node22: Node {
+            parameters:
+                address = 22;
             @display("p=492,380");
         }
         node23: Node {
+            parameters:
+                address = 23;
             @display("p=439,252");
         }
         node24: Node {
+            parameters:
+                address = 24;
             @display("p=535,185");
         }
         node25: Node {
+            parameters:
+                address = 25;
             @display("p=447,119");
         }
         node26: Node {
+            parameters:
+                address = 26;
             @display("p=643,185");
         }
         node27: Node {
+            parameters:
+                address = 27;
             @display("p=701,92");
         }
         node28: Node {
+            parameters:
+                address = 28;
             @display("p=560,112");
         }
         node29: Node {
+            parameters:
+                address = 29;
             @display("p=574,34");
         }
         node30: Node {
+            parameters:
+                address = 30;
             @display("p=459,23");
         }
         node31: Node {
+            parameters:
+                address = 31;
             @display("p=734,218");
         }
         node32: Node {
+            parameters:
+                address = 32;
             @display("p=630,288");
         }
         node36: Node {
+            parameters:
+                address = 36;
             @display("p=806,145");
         }
         node39: Node {
+            parameters:
+                address = 39;
             @display("p=812,360");
         }
     connections allowunconnected:
