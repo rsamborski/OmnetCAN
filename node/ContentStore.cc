@@ -68,7 +68,7 @@ int ContentStore::getNumberObjectsInStore() {
 
 void ContentStore::store(const Packet* packet) {
 
-    emit(csDataStoreSignal, 0);
+    emit(csDataStoreSignal, 1);
 
     ObjectValues::iterator it = objectValues.find(packet->getContentId());
 
@@ -89,7 +89,7 @@ void ContentStore::store(const Packet* packet) {
 
         if (objectValues.size() == capacity) {
             // content store full, need to replace content
-            emit(csDataExchangeSignal, 0);
+            emit(csDataExchangeSignal, 1);
             EV << "###### REPLACE DATA" << endl;
             removeObject();
         }
@@ -136,6 +136,7 @@ void ContentStore::initialize() {
 
     dataHitSignal = registerSignal("dataHit");
     dataMissSignal = registerSignal("dataMiss");
+    dataAllSignal = registerSignal("dataAll");
     csDataStoreSignal = registerSignal("csDataStore");
     csDataExchangeSignal = registerSignal("csDataExchange");
 
@@ -146,7 +147,6 @@ void ContentStore::handleMessage(cMessage* msg) {
     //if(strcmp(msg->getName(), msgContentLookupDelay) == 0){
 
     if (msg->isSelfMessage()) {
-
         if (queue.empty()) {
             return;
         }
@@ -154,6 +154,8 @@ void ContentStore::handleMessage(cMessage* msg) {
         Packet* pk = check_and_cast<Packet*>(queue.pop());
         //emit(csDataLookupSignal, pk->getContentId());
         Packet* pkFound = find(pk->getContentId());
+
+        emit(dataAllSignal, pk->getContentId());
 
         if (pkFound != NULL) {
 

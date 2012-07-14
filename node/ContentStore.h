@@ -71,6 +71,7 @@ class ContentStore : public cSimpleModule {
         const char* msgContentLookupDelay;
         simsignal_t dataHitSignal;
         simsignal_t dataMissSignal;
+        simsignal_t dataAllSignal;
         simsignal_t csDataStoreSignal;
         simsignal_t csDataExchangeSignal;
 

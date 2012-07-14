@@ -156,7 +156,9 @@ void Routing::handleMessage(cMessage *msg)
         //if not from content store
 
         if (strcmp(pk->getArrivalGate()->getName(), "storeIn") != 0) {
-            pk->increaseHopToContent();
+            if(incoming_face != -1) {   // we don't increase hopcount for packets coming from local face
+                pk->increaseHopToContent();
+            }
             EV << "Hop count for packet #" << pk->getContentId() << " is: " << pk->getHopToContent() << endl;
 
 //            // Interest packet behavior
@@ -220,7 +222,9 @@ void Routing::handleMessage(cMessage *msg)
                 sendToPIT(datapk);
                 delete(datapk);
 
-                /* Drop interest packet */
+                /* Drop interest packet and emit hopToContentSignal */
+                emit(hopToContentSignal, pk->getHopToContent());
+                EV << "Data packet " << pk->getName() << " found after " << pk->getHopToContent() << " hops"<< endl;
                 delete pk;
                 return;
             }
@@ -289,7 +293,7 @@ void Routing::handleMessage(cMessage *msg)
             EV << "Data sent to store in cache." << endl;
         } else {
             emit(hopToContentSignal, pk->getHopToContent());
-            //EV << "Data packet " << pk->getName() << " returned from contentStore " << endl;
+            EV << "Data packet " << pk->getName() << " returned from contentStore after " << pk->getHopToContent() << " hops"<< endl;
         }
 
     	/* Send the content further */
