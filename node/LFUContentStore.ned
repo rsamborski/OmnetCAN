@@ -28,6 +28,7 @@ simple LFUContentStore like ContentStore{
 		@signal[csDataExchange](type="int");
 		@statistic[dataHit](title="packet found in content store";record=vector,count,sum,histogram;interpolationmode=none);
 		@statistic[dataMiss](title="packet NOT found in content store";record=vector,count,sum;interpolationmode=none);
+		@statistic[dataAll](title="all packets sent to content store";record=vector,count,sum;interpolationmode=none);		
 		//@statistic[csDataLookup](title="searching packet in content store";record=vector,count,sum;interpolationmode=none);
 		@statistic[csDataStore](title="data stored in content store";record=vector,count,sum;interpolationmode=none);
 		@statistic[csDataExchange](title="data replaced in content store";record=vector,count,sum;interpolationmode=none);
