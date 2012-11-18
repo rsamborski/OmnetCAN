@@ -6,5 +6,5 @@ libomnetcan.so
 libomnetcan.a
 libomnetcan.dll
 libomnetcan.dylib
-#*_m.cc 
-#*_m.h
+*_m.cc 
+*_m.h
