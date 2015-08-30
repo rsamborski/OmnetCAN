@@ -1,7 +1,0 @@
-Project: OmnetCAN
-Description: Content Aware Network simulation for Omnet++, based on CCN architecture
-Author: Remigiusz Samborski
-
-Resources:
- OMNeT++ Network Simulation Framework - http://www.omnetpp.org/
- CCNx project - http://www.ccnx.org/
